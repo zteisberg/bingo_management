@@ -1,11 +1,11 @@
-# Waystone Bingo
+# Banana Hammocks Bingo
 
-A private, realtime OSRS bingo dashboard built with React, TypeScript, Tailwind, Supabase, and Vercel. Discord is the only login method; a server-side Edge Function checks the required guild role before RLS allows any board data to be read.
+A private, realtime OSRS bingo dashboard and persistent team chat built with React, TypeScript, Tailwind, Supabase, and Vercel. Discord is the only login method; a server-side Edge Function checks the required guild role before RLS allows any team data to be read.
 
 ## 1. Create and configure Supabase
 
 1. Create a Supabase project.
-2. In the SQL Editor, run `supabase/migrations/20260801000000_initial_schema.sql`, then customize and run `supabase/seed.sql`.
+2. In the SQL Editor, run the files in `supabase/migrations` in filename order, then customize and run `supabase/seed.sql`.
 3. In Authentication → Providers → Discord, enable Discord and enter your Discord OAuth client ID and secret.
 4. In Authentication → URL Configuration, set the Site URL to the production Vercel URL. Add `http://localhost:5173` and your Vercel URL to Redirect URLs.
 5. Deploy the function:
@@ -23,7 +23,7 @@ A private, realtime OSRS bingo dashboard built with React, TypeScript, Tailwind,
    where discord_username = 'YOUR_DISCORD_DISPLAY_NAME';
    ```
 
-The migration enables RLS on every table. Verified users can read board data; members can create, edit, and delete only their own contributor record; only verified admins can update tiles and sections. Profile verification itself is written only by the Edge Function with the service role.
+The migrations enable RLS on every table. Verified users can read board and chat data, post messages, and manage their own contributions and chat messages. Admins can moderate chat and update tiles and sections. Profile verification itself is written only by the Edge Function with the service role.
 
 ## 2. Configure Discord
 
@@ -74,4 +74,4 @@ The supplied seed matches the provided board image: only the white center starts
 
 ## Realtime note
 
-The migration adds `sections`, `tiles`, and `tile_contributors` to the `supabase_realtime` publication. If they were already added manually, remove that final `alter publication` line before rerunning the migration. Realtime change delivery still respects RLS.
+The migrations add `sections`, `tiles`, `tile_contributors`, and `chat_messages` to the `supabase_realtime` publication. If they were already added manually, remove the matching final `alter publication` line before rerunning a migration. Realtime change delivery still respects RLS.
