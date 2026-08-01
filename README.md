@@ -35,7 +35,7 @@ The migration enables RLS on every table. Verified users can read board data; me
    ```
 
 3. Supabase requests `identify guilds.members.read` during sign-in. The latter scope lets the user-authorized token read that user's member record in guild `1229804943368523806`.
-4. Ensure approved users hold role `1523484700088467500` in that guild.
+4. Ensure approved users hold role `1523484700088467557` in that guild.
 
 The Discord access token is sent over HTTPS to the verification function after login and is never stored in Postgres. The function validates the caller's Supabase JWT, calls Discord, and uses the server-only service role key to update the matching profile.
 

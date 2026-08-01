@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-const GUILD_ID='1229804943368523806', ROLE_ID='1523484700088467500'
+const GUILD_ID='1229804943368523806', ROLE_ID='1523484700088467557'
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'}
 Deno.serve(async req=>{if(req.method==='OPTIONS')return new Response('ok',{headers:cors});try{
   const auth=req.headers.get('Authorization'); if(!auth)throw new Error('Missing Supabase authorization')
