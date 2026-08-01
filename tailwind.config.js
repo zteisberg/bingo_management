@@ -1,0 +1,2 @@
+/** @type {import('tailwindcss').Config} */
+export default { content: ['./index.html','./src/**/*.{js,ts,jsx,tsx}'], theme: { extend: { colors: { ink:'#10150f', panel:'#182017', parchment:'#d8c69b', moss:'#6f8d45', gold:'#c9a752' }, fontFamily: { display:['Georgia','serif'], sans:['Inter','ui-sans-serif','system-ui'] }, boxShadow: { insetgold:'inset 0 0 0 1px rgba(201,167,82,.25)', tile:'0 12px 35px rgba(0,0,0,.28)' } } }, plugins: [] }
