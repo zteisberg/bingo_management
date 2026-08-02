@@ -1,4 +1,4 @@
-import { Compass, Flag, LockKeyhole, Users } from 'lucide-react'
+import { Compass, LockKeyhole, Users } from 'lucide-react'
 import type { Section, Tile } from '../types'
 
 const statusColors={open:'bg-stone-400',in_progress:'bg-amber-400',complete:'bg-emerald-500'}
@@ -15,7 +15,8 @@ export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly}:{se
     <nav className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-white/[.07] bg-panel/50 p-2" aria-label="Board navigation">
       <span className="flex items-center gap-2 px-2 text-[10px] font-bold uppercase tracking-[.18em] text-stone-500"><Compass size={14} className="text-gold"/>Jump to</span>
       {routeTargets.map(([label,id])=><button key={id} onClick={()=>jumpTo(id)} className="rounded-lg border border-white/[.08] px-3 py-1.5 text-xs text-stone-300 hover:border-gold/40 hover:text-gold">{label}</button>)}
-      {needsHelpOnly?<span className="ml-auto rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-200">Highlighting tiles with no volunteers</span>:null}
+      <span className="ml-auto flex items-center gap-2 px-2 text-[10px] text-stone-500"><span className="h-3 w-3 border-r-2 border-t-2 border-gold"/>Gold tile edges show unlock direction</span>
+      {needsHelpOnly?<span className="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-200">Highlighting tiles with no volunteers</span>:null}
     </nav>
     <div className="scrollbar overflow-auto pb-6"><div className="grid min-w-[1460px] gap-5" style={{gridTemplateColumns:`repeat(${cols},minmax(260px,1fr))`,gridTemplateRows:`repeat(${rows},auto)`}}>
       {sections.map(section=>{
@@ -32,9 +33,11 @@ export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly}:{se
             {tiles.filter(tile=>tile.section_id===section.id).sort((a,b)=>a.row-b.row||a.col-b.col).map(tile=>{
               const secret=tile.name.toLowerCase()==='top secret',gateway=tile.tile_gateways.length>0,count=tile.tile_contributors.length,covered=count>=3,uncovered=count===0
               const destinations=tile.tile_gateways.map(item=>sectionNames.get(item.section_id)||item.section_id).join(' + ')
+              const directions=new Set(tile.tile_gateways.flatMap(item=>{const target=sections.find(candidate=>candidate.id===item.section_id);if(!target)return [];const result:string[]=[];if(target.row<section.row)result.push('north');if(target.row>section.row)result.push('south');if(target.col<section.col)result.push('west');if(target.col>section.col)result.push('east');return result}))
               const filtered=needsHelpOnly&&!uncovered&&!secret
-              return <button key={tile.id} title={secret?'Mystery tile — revealed on bingo day':tile.name} style={{gridColumn:tile.col,gridRow:tile.row}} disabled={secret} onClick={()=>onTile(tile,section)} className={`group min-h-24 rounded-lg border p-2.5 text-left transition ${secret?'cursor-not-allowed border-violet-400/30 bg-violet-950/30':gateway?'border-gold/45 bg-[#242a1e] hover:-translate-y-0.5 hover:border-gold':'border-white/10 bg-[#20261f] hover:-translate-y-0.5 hover:border-gold/50'} ${!section.unlocked&&!secret?'saturate-50':''} ${filtered?'opacity-20':''}`}>
-                <div className="flex items-start justify-between gap-2"><span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${secret?'bg-violet-400':statusColors[tile.status]}`}/>{gateway?<span className="flex items-center gap-1 rounded bg-gold/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-gold"><Flag size={10}/>Gateway</span>:null}</div>
+              return <button key={tile.id} title={secret?'Mystery tile — revealed on bingo day':tile.name} style={{gridColumn:tile.col,gridRow:tile.row}} disabled={secret} onClick={()=>onTile(tile,section)} className={`group relative min-h-24 overflow-hidden rounded-lg border p-2.5 text-left transition ${secret?'cursor-not-allowed border-violet-400/30 bg-violet-950/30':'border-white/10 bg-[#20261f] hover:-translate-y-0.5 hover:border-gold/50'} ${gateway?'bg-[#242a1e]':''} ${!section.unlocked&&!secret?'saturate-50':''} ${filtered?'opacity-20':''}`}>
+                {directions.has('north')?<span className="absolute inset-x-0 top-0 h-[3px] bg-gold"/>:null}{directions.has('east')?<span className="absolute inset-y-0 right-0 w-[3px] bg-gold"/>:null}{directions.has('south')?<span className="absolute inset-x-0 bottom-0 h-[3px] bg-gold"/>:null}{directions.has('west')?<span className="absolute inset-y-0 left-0 w-[3px] bg-gold"/>:null}
+                <div className="flex items-start justify-between gap-2"><span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${secret?'bg-violet-400':statusColors[tile.status]}`}/></div>
                 <p className={`mt-2 line-clamp-3 text-[11px] font-semibold leading-[15px] ${secret?'text-center uppercase tracking-[.16em] text-violet-200':'text-stone-100'}`}>{secret?'?  Mystery tile':tile.name}</p>
                 {gateway?<p className="mt-2 line-clamp-1 text-[8px] font-bold uppercase tracking-wide text-gold/75">Unlocks → {destinations}</p>:null}
                 {!secret?<div className={`mt-2 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold ${uncovered?'border-red-400/30 bg-red-500/10 text-red-200':covered?'border-emerald-400/30 bg-emerald-500/10 text-emerald-200':'border-white/10 bg-black/20 text-stone-300'}`}><Users size={11}/>{count}{uncovered?' · needs help':covered?' · covered':''}</div>:null}
