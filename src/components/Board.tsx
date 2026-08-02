@@ -7,7 +7,7 @@ const cornerIds=new Set(['northwest','northeast','southwest','southeast'])
 const routeTargets=[['Center','center'],['North','north_gate'],['East','east_gate'],['South','south_gate'],['West','west_gate']] as const
 const sectionShortNames:Record<string,string>={center:'CENTER',north_split:'N FORK',east_split:'E FORK',south_split:'S FORK',west_split:'W FORK',north_gate:'N GATE',east_gate:'E GATE',south_gate:'S GATE',west_gate:'W GATE',northwest:'NW',northeast:'NE',southwest:'SW',southeast:'SE'}
 
-export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly}:{sections:Section[];tiles:Tile[];onTile:(t:Tile,s:Section)=>void;isAdmin:boolean;onToggle:(s:Section)=>void;needsHelpOnly:boolean}){
+export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly,currentProfileId}:{sections:Section[];tiles:Tile[];onTile:(t:Tile,s:Section)=>void;isAdmin:boolean;onToggle:(s:Section)=>void;needsHelpOnly:boolean;currentProfileId:string}){
   const cols=Math.max(1,...sections.map(s=>s.col)),rows=Math.max(1,...sections.map(s=>s.row))
   const sectionNames=new Map(sections.map(section=>[section.id,section.name]))
 
@@ -39,7 +39,7 @@ export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly}:{se
           <div className="grid gap-2" style={{gridTemplateColumns:`repeat(${section.tile_cols||3},minmax(0,1fr))`}}>
             {section.id==='center'?<div style={{gridColumn:2,gridRow:2}} className="grid min-h-24 place-items-center overflow-hidden rounded-lg border border-gold/40 bg-gold/[.07]"><img src="https://raw.githubusercontent.com/zteisberg/bingo_management/main/public/banana-hammocks-logo.png" alt="Banana Hammocks team logo" className="h-full min-h-24 w-full object-cover"/></div>:null}
             {tiles.filter(tile=>tile.section_id===section.id).sort((a,b)=>a.row-b.row||a.col-b.col).map(tile=>{
-              const secret=tile.name.toLowerCase()==='top secret',gateway=tile.tile_gateways.length>0,count=tile.tile_contributors.length,covered=count>=3,uncovered=count===0
+              const secret=tile.name.toLowerCase()==='top secret',gateway=tile.tile_gateways.length>0,count=tile.tile_contributors.length,covered=count>=3,uncovered=count===0,signedUp=tile.tile_contributors.some(contributor=>contributor.profile_id===currentProfileId)
               const destinations=tile.tile_gateways.map(item=>sectionNames.get(item.section_id)||item.section_id).join(' + ')
               const directions=new Set(tile.tile_gateways.flatMap(item=>{const target=sections.find(candidate=>candidate.id===item.section_id);if(!target)return [];const result:string[]=[];if(target.row<section.row)result.push('north');if(target.row>section.row)result.push('south');if(target.col<section.col)result.push('west');if(target.col>section.col)result.push('east');return result}))
               const filtered=needsHelpOnly&&!uncovered&&!secret
@@ -50,7 +50,7 @@ export function Board({sections,tiles,onTile,isAdmin,onToggle,needsHelpOnly}:{se
                 {!secret?<span aria-label={`Status: ${tile.status.replace('_',' ')}`} title={`Status: ${tile.status.replace('_',' ')}`} className={`absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full ring-2 ring-black/35 ${statusColors[tile.status]}`}/>:null}
                 <p className={`line-clamp-3 pr-4 text-[11px] font-semibold leading-[15px] ${secret?'text-center uppercase tracking-[.16em] text-violet-200':'text-zinc-100'} ${section.unlocked?'':'opacity-60'}`}>{secret?'?  Mystery tile':tile.name}</p>
                 {gateway?<p className="mt-2 text-[9px] font-black uppercase tracking-wide text-gold/90" aria-label={`Unlocks ${destinations}`} title={`Unlocks ${destinations}`}>→ {directionLabel}</p>:null}
-                {!secret?<div aria-label={coverageLabel} title={coverageLabel} className={`mt-2 inline-flex min-w-8 items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${uncovered?'border-red-300/60 bg-red-500/25 text-red-100':covered?'border-emerald-400/40 bg-emerald-500/15 text-emerald-100':'border-amber-300/50 bg-amber-400/15 text-amber-100'}`}><Users size={11}/>{count}</div>:null}
+                {!secret?<div aria-label={`${coverageLabel}${signedUp?' — you are signed up':''}`} title={`${coverageLabel}${signedUp?' — you are signed up':''}`} className={`mt-2 inline-flex min-w-8 items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black transition ${uncovered?'border-red-300/60 bg-red-500/25 text-red-100':covered?'border-emerald-400/40 bg-emerald-500/15 text-emerald-100':'border-amber-300/50 bg-amber-400/15 text-amber-100'} ${signedUp?'ring-2 ring-gold/90 shadow-[0_0_14px_rgba(232,193,86,.85)]':''}`}><Users size={11} className={signedUp?'text-gold':''}/>{count}</div>:null}
               </button>
             })}
           </div>
