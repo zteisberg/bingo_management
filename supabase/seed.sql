@@ -1,5 +1,5 @@
 -- Current Clan of Dads board, transcribed from the supplied layout reference.
--- TOP SECRET cells contain no hidden answer in the database. Replace their names on reveal day.
+-- Includes the final clue-casket objectives revealed with the full board drop.
 -- This file is intended for a fresh project. Re-running it without clearing existing data will conflict.
 
 insert into public.sections(id,name,unlocked,row,col,tile_cols) values
@@ -24,12 +24,12 @@ insert into public.tiles(section_id,name,row,col) values
 -- Fork sections. Each side of a fork unlocks the outer board in that direction.
 insert into public.tiles(section_id,name,row,col) values
  ('north_split','Zulrah Unique',1,1), ('north_split','Royal Titans Unique',1,2),
- ('north_split','Top Secret',2,1), ('north_split','Xerics Talisman (inert)',2,2),
- ('west_split','All Metal Zoots',1,1), ('west_split','Top Secret',1,2),
+ ('north_split','Elite Clue Casket over 140K',2,1), ('north_split','Xerics Talisman (inert)',2,2),
+ ('west_split','All Metal Zoots',1,1), ('west_split','Easy Clue Casket over 20k',1,2),
  ('west_split','Steel Ring',2,1), ('west_split','All Skull Sceptre Pieces',2,2),
- ('east_split','Top Secret',1,1), ('east_split','Every Satchel',1,2),
+ ('east_split','Hard Clue Casket over 105K',1,1), ('east_split','Every Satchel',1,2),
  ('east_split','Zombie Axe or Helm',2,1), ('east_split','Shield Left Half',2,2),
- ('south_split','Top Secret',1,1), ('south_split','BOTH Mogre Uniques',1,2),
+ ('south_split','Medium Clue Casket over 40K',1,1), ('south_split','BOTH Mogre Uniques',1,2),
  ('south_split','Antler Guard',2,1), ('south_split','Granite Shield',2,2);
 
 insert into public.tiles(section_id,name,row,col) values
@@ -75,6 +75,3 @@ select t.id,m.destination from public.tiles t join (values
  ('south_split',1,2,'southeast'), ('south_split',2,2,'southeast')
 ) as m(source_section,tile_row,tile_col,destination)
 on t.section_id=m.source_section and t.row=m.tile_row and t.col=m.tile_col;
-
--- Optional reveal-day example (admins may also rename these in SQL):
--- update public.tiles set name='Revealed objective', description='...' where section_id='north_split' and row=2 and col=1;

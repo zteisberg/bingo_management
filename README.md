@@ -63,7 +63,7 @@ Edit `supabase/seed.sql`. Section `row` and `col` place sections on the overall 
 
 Gateway relationships live in `tile_gateways`. Add one row for every tile → destination relationship. A tile may have several rows, so a center corner objective can count toward both the north and west routes, for example. A destination unlocks only after every tile mapped to it is complete. Admins can also override a section's lock state in the interface.
 
-The supplied seed matches the provided board image: only the white center starts unlocked, every objective starts `open`, and the center logo is not stored as an objective. Unrevealed cells are stored only as `Top Secret`—their real values should not be entered until reveal day, which prevents them from leaking through the API.
+The supplied seed matches the final revealed board: only the white center starts unlocked, every objective starts `open`, and the center logo is not stored as an objective.
 
 ## 5. Deploy to Vercel
 
